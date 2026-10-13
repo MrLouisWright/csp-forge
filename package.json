@@ -1,0 +1,42 @@
+{
+  "name": "csp-forge",
+  "version": "1.0.0",
+  "description": "Scan a built static site (dist/, build/, out/) or live URL and generate a tight Content-Security-Policy with sha256 hashes for inline code. Outputs header, meta, Nginx, Apache, Netlify, Vercel, Helmet, JSON; --check mode for CI.",
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "csp-forge": "bin/csp-forge.js"
+  },
+  "files": [
+    "src",
+    "bin",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "keywords": ["csp", "content-security-policy", "security", "security-headers", "static-site", "vite", "nginx", "netlify", "vercel", "helmet", "sha256", "hash", "ci", "cli", "sarif", "xss"],
+  "author": "Louis Wright <hello@louiswright.co.uk> (https://github.com/MrLouisWright)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MrLouisWright/csp-forge.git"
+  },
+  "bugs": {
+    "url": "https://github.com/MrLouisWright/csp-forge/issues"
+  },
+  "homepage": "https://github.com/MrLouisWright/csp-forge#readme"
+}

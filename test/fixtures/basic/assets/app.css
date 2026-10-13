@@ -1,0 +1,5 @@
+@import url("https://cdn.jsdelivr.net/npm/normalize.css/normalize.css");
+@font-face { font-family: X; src: url(/fonts/x.woff2) format("woff2"), url("https://use.typekit.net/x.woff") format("woff"); }
+.hero { background: url('https://images.unsplash.com/bg.jpg') }
+.icon { background-image: url(data:image/svg+xml;base64,PHN2Zz48L3N2Zz4=) }
+/* url(https://commented.example.net/ignored.png) */
