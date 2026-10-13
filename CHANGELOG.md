@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [1.0.1] - 2026-10-13
+
+### Changed
+- CI: harden workflows (actions pinned to SHAs, least-privilege permissions, persist-credentials: false)
+
 ## [1.0.0] - 2026-10-13
 
 ### Added
