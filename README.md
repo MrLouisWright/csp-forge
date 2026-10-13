@@ -265,4 +265,4 @@ Then create a GitHub release from the new tag. `.github/workflows/release.yml` r
 
 ## License
 
-MIT © Louis Wright
+MIT © Louis Wright ([Louis Wright](https://github.com/MrLouisWright))
