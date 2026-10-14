@@ -69,12 +69,13 @@ test('parse / serialize round trip and allows()', () => {
 });
 
 test('every format renders', async () => {
-  const { directives, scan } = await generate({ dir: fx('basic'), config: { reportUri: '/r' } });
-  const out = Object.fromEntries(FORMATS.map((f) => [f, render(directives, f, { scan })]));
+  const reporting = { reportTo: { name: 'csp', url: 'https://example.com/r' } };
+  const { directives, scan } = await generate({ dir: fx('basic'), config: { reportUri: '/r', reportTo: reporting.reportTo } });
+  const out = Object.fromEntries(FORMATS.map((f) => [f, render(directives, f, { scan, reporting })]));
   assert.match(out.header, /^Content-Security-Policy: default-src 'self';/);
   assert.match(out.meta, /^<meta http-equiv="Content-Security-Policy" content="default-src/);
   assert.ok(!out.meta.includes('frame-ancestors') && !out.meta.includes('report-uri'));
-  assert.match(out.nginx, /^add_header Content-Security-Policy ".*" always;$/);
+  assert.match(out.nginx, /^add_header Content-Security-Policy ".*" always;\nadd_header Reporting-Endpoints/);
   assert.match(out.apache, /^Header always set Content-Security-Policy "/);
   assert.match(out.netlify, /^\/\*\n {2}Content-Security-Policy: /);
   assert.equal(JSON.parse(out.vercel).headers[0].headers[0].key, 'Content-Security-Policy');

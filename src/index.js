@@ -7,6 +7,13 @@ import { loadConfig } from './config.js';
 import { toSarif } from './sarif.js';
 import { pretty, summary } from './format.js';
 import { injectMeta, writeHeadersFile } from './write.js';
+export {
+  generateNonce, NONCE_PLACEHOLDER, nonceSource, applyNonceToPolicyString, buildDirectivesWithNonce,
+  serializeWithNonce, injectNoncesIntoHtml, strictDynamicScriptSrc, createNonceMiddleware,
+} from './ssr.js';
+export {
+  normalizeReporting, formatReportingEndpoints, reportingEndpointsHeader, reportingEndpointsJson, applyReportingDirectives,
+} from './reporting.js';
 
 export { scanDir, scanUrl, newResult, merge, scanHtml, scanCss, scanJs, sha256, toSource,
   buildPolicy, serialize, parsePolicy, effective, allows, collapseOrigins, DEFAULTS,

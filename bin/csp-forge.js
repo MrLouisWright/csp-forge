@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { generate, render, FORMATS, checkPolicy, shouldFail, loadConfig, toSarif, pretty, summary, resolveExisting, injectMeta, writeHeadersFile } from '../src/index.js';
@@ -17,8 +16,11 @@ Scan:
 Generate:
   -f, --format <fmt>        ${FORMATS.join(' | ')}  (default: header)
       --nonce[=value]       Use 'nonce-<value>' (default placeholder {{NONCE}}) instead of inline hashes
+      --strict-dynamic      Nonce mode with 'strict-dynamic' (implies --nonce; omits script hashes)
       --report-only         Emit Content-Security-Policy-Report-Only
       --report-uri <url>    Add report-uri
+      --report-to <name>    Add report-to (pair with --reporting-endpoint-url for Reporting-Endpoints header)
+      --reporting-endpoint-url <url>  URL for the endpoint named by --report-to
       --frame-ancestors <v> Default 'none' (e.g. "'self'"); "off" omits it
       --allow-wildcards     Allow collapsing 3+ subdomains to https://*.domain
       --no-upgrade          Omit upgrade-insecure-requests
@@ -52,8 +54,11 @@ function parse(argv) {
       case '-c': case '--config': o.config = val(); break;
       case '-f': case '--format': o.format = val(); break;
       case '--nonce': o.nonce = eq !== undefined ? eq : true; break;
+      case '--strict-dynamic': o.strictDynamic = true; break;
       case '--report-only': o.reportOnly = true; break;
       case '--report-uri': o.reportUri = val(); break;
+      case '--report-to': o.reportTo = val(); break;
+      case '--reporting-endpoint-url': o.reportingEndpointUrl = val(); break;
       case '--frame-ancestors': o.frameAncestors = val(); break;
       case '--allow-wildcards': o.allowWildcards = true; break;
       case '--no-upgrade': o.upgrade = false; break;
@@ -84,7 +89,10 @@ let config;
 try { config = await loadConfig(process.cwd(), o.config); } catch (e) { die(`config: ${e.message}`); }
 const cfg = { ...config };
 if (o.nonce !== undefined) cfg.nonce = o.nonce;
+if (o.strictDynamic) { cfg.strictDynamic = true; if (cfg.nonce === undefined || cfg.nonce === false) cfg.nonce = true; }
 if (o.reportUri) cfg.reportUri = o.reportUri;
+if (o.reportTo) cfg.reportTo = o.reportingEndpointUrl ? { name: o.reportTo, url: o.reportingEndpointUrl } : o.reportTo;
+if (o.reportingEndpointUrl && !o.reportTo) die('--reporting-endpoint-url requires --report-to');
 if (o.frameAncestors) cfg.frameAncestors = o.frameAncestors === 'off' ? false : o.frameAncestors;
 if (o.allowWildcards) cfg.allowWildcards = true;
 if (o.upgrade === false) cfg.upgradeInsecureRequests = false;
@@ -118,12 +126,18 @@ if (o.check) {
 } else {
   if (!o.quiet) console.error(summary(scan));
   let out;
-  try { out = render(directives, format, { reportOnly: o.reportOnly, scan }); } catch (e) { die(e.message); }
+  const reporting = { reportUri: cfg.reportUri, reportTo: cfg.reportTo, reportingEndpointUrl: cfg.reportingEndpointUrl, endpoints: cfg.reportingEndpoints };
+  try { out = render(directives, format, { reportOnly: o.reportOnly, scan, reporting }); } catch (e) { die(e.message); }
   if (o.write && format === 'meta') {
     const changed = await injectMeta(resolve(dir), scan.files, out);
     console.error(`csp-forge: injected <meta> CSP into ${changed.length} HTML file(s) (frame-ancestors/report-uri are not supported in <meta>; set them as headers)`);
   } else if (o.write && format === 'netlify') {
-    const p = await writeHeadersFile(resolve(dir), o.reportOnly ? 'Content-Security-Policy-Report-Only' : 'Content-Security-Policy', render(directives, 'raw'));
+    const hdr = o.reportOnly ? 'Content-Security-Policy-Report-Only' : 'Content-Security-Policy';
+    const p = await writeHeadersFile(resolve(dir), hdr, render(directives, 'raw'));
+    try {
+      const repLine = render(directives, 'reporting-endpoints', { reporting });
+      await writeHeadersFile(resolve(dir), 'Reporting-Endpoints', repLine.replace(/^Reporting-Endpoints: /, ''));
+    } catch { /* no reporting config */ }
     console.error(`csp-forge: wrote ${p}`);
   }
   console.log(out);
