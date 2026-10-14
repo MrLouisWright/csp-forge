@@ -88,7 +88,7 @@
   "bugs": {
     "url": "https://github.com/MrLouisWright/csp-forge/issues"
   },
-  "homepage": "https://github.com/MrLouisWright/csp-forge#readme",
+  "homepage": "https://mrlouiswright.github.io/csp-forge/",
   "devDependencies": {
     "esbuild": "^0.25.0",
     "typescript": "^5.8.2"
