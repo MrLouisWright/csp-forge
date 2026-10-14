@@ -1,23 +1,49 @@
 {
   "name": "csp-forge",
-  "version": "1.0.1",
-  "description": "Scan a built static site (dist/, build/, out/) or live URL and generate a tight Content-Security-Policy with sha256 hashes for inline code. Outputs header, meta, Nginx, Apache, Netlify, Vercel, Helmet, JSON; --check mode for CI.",
+  "version": "1.1.0",
+  "description": "Scan a built static site (dist/, build/, out/) or live URL and generate a tight Content-Security-Policy with sha256 hashes or nonce + strict-dynamic for SSR. Vite/webpack plugins, reporting headers, --check for CI.",
   "type": "module",
-  "main": "./src/index.js",
-  "types": "./src/index.d.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./src/index.d.ts",
-      "default": "./src/index.js"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./vite": {
+      "import": {
+        "types": "./dist/plugins/vite.d.ts",
+        "default": "./dist/vite.js"
+      },
+      "require": {
+        "types": "./dist/plugins/vite.d.ts",
+        "default": "./dist/vite.cjs"
+      }
+    },
+    "./webpack": {
+      "import": {
+        "types": "./dist/plugins/webpack.d.ts",
+        "default": "./dist/webpack.js"
+      },
+      "require": {
+        "types": "./dist/plugins/webpack.d.ts",
+        "default": "./dist/webpack.cjs"
+      }
     },
     "./package.json": "./package.json"
   },
   "bin": {
-    "csp-forge": "bin/csp-forge.js"
+    "csp-forge": "dist/cli.js"
   },
   "files": [
-    "src",
-    "bin",
+    "dist",
     "README.md",
     "CHANGELOG.md",
     "LICENSE"
@@ -26,7 +52,9 @@
     "node": ">=18"
   },
   "scripts": {
-    "test": "node --test test/*.test.js"
+    "build": "node scripts/build.mjs",
+    "test": "npm run build && node --test test/*.test.js",
+    "prepack": "npm run build"
   },
   "keywords": [
     "csp",
@@ -35,6 +63,9 @@
     "security-headers",
     "static-site",
     "vite",
+    "webpack",
+    "nonce",
+    "strict-dynamic",
     "nginx",
     "netlify",
     "vercel",
@@ -44,7 +75,9 @@
     "ci",
     "cli",
     "sarif",
-    "xss"
+    "xss",
+    "report-to",
+    "report-uri"
   ],
   "author": "Louis Wright <hello@louiswright.co.uk> (https://github.com/MrLouisWright)",
   "license": "MIT",
@@ -55,5 +88,9 @@
   "bugs": {
     "url": "https://github.com/MrLouisWright/csp-forge/issues"
   },
-  "homepage": "https://github.com/MrLouisWright/csp-forge#readme"
+  "homepage": "https://github.com/MrLouisWright/csp-forge#readme",
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "typescript": "^5.8.2"
+  }
 }

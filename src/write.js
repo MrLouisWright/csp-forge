@@ -24,9 +24,10 @@ export async function writeHeadersFile(dir, headerName, value) {
   let text = '';
   try { text = await readFile(p, 'utf8'); } catch { /* new */ }
   const line = `  ${headerName}: ${value}`;
-  const re = /^[ \t]+Content-Security-Policy(-Report-Only)?:.*$/m;
+  const re = new RegExp(`^[ \\t]+${headerName.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&')}:.*$`, 'm');
   if (re.test(text)) text = text.replace(re, line);
   else if (/^\/\*\s*$/m.test(text)) text = text.replace(/^\/\*\s*$/m, `/*\n${line}`);
+  else if (/^\/\*\n/m.test(text)) text = text.replace(/^\/\*\n/m, `/*\n${line}\n`);
   else text = `${text}${text && !text.endsWith('\n') ? '\n' : ''}/*\n${line}\n`;
   await writeFile(p, text);
   return p;

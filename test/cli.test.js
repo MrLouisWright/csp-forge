@@ -6,7 +6,7 @@ import { cpSync, mkdtempSync, readFileSync, writeFileSync, rmSync } from 'node:f
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-const bin = fileURLToPath(new URL('../bin/csp-forge.js', import.meta.url));
+const bin = fileURLToPath(new URL('../dist/cli.js', import.meta.url));
 const fx = (n) => fileURLToPath(new URL(`./fixtures/${n}`, import.meta.url));
 const env = { ...process.env, NO_COLOR: '1' };
 delete env.FORCE_COLOR;
@@ -37,6 +37,8 @@ test('generate prints policy on stdout, summary on stderr', () => {
   assert.equal(run([fx('basic'), '-q']).stderr, '');
   assert.match(run([fx('basic'), '--report-only', '--report-uri', '/csp-report']).stdout, /^Content-Security-Policy-Report-Only: .*report-uri \/csp-report/);
   assert.match(run([fx('basic'), '--nonce', '-q']).stdout, /'nonce-\{\{NONCE\}\}'/);
+  assert.match(run([fx('basic'), '--strict-dynamic', '-q']).stdout, /'strict-dynamic'/);
+  assert.match(run([fx('basic'), '--report-to', 'csp', '--reporting-endpoint-url', 'https://example.com/csp', '-f', 'reporting-endpoints', '-q']).stdout, /^Reporting-Endpoints: csp="https:\/\/example.com\/csp"/);
 });
 
 test('--check exit codes, --json, --sarif, --fail-on', () => {

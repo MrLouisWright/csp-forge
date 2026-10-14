@@ -3,6 +3,9 @@ const ORDER = ['default-src', 'script-src', 'style-src', 'img-src', 'font-src', 
 const KEYWORD_ORDER = ["'none'", "'self'", "'strict-dynamic'", "'unsafe-hashes'", "'unsafe-eval'", "'unsafe-inline'", "'wasm-unsafe-eval'"];
 export const META_UNSUPPORTED = ['frame-ancestors', 'report-uri', 'report-to', 'sandbox'];
 
+/** @typedef {Record<string, string[]>} DirectiveMap */
+/** @typedef {typeof DEFAULTS & { directives?: Record<string, string[] | string>; reportTo?: string | { name: string; url: string; maxAge?: number }; reportingEndpointUrl?: string; reportingEndpoints?: { name: string; url: string; maxAge?: number }[]; strictDynamic?: boolean }} BuildConfig */
+
 export const DEFAULTS = {
   frameAncestors: "'none'",
   baseUri: "'self'",
@@ -12,7 +15,9 @@ export const DEFAULTS = {
   wildcardThreshold: 3,
   allowEval: false,
   nonce: false,
+  strictDynamic: false,
   reportUri: undefined,
+  reportTo: undefined,
   directives: {},
 };
 
@@ -51,9 +56,14 @@ export function buildPolicy(scan, config = {}) {
   const fin = (list) => collapseOrigins(upgrade(list), c);
   d['default-src'] = ["'self'"];
 
-  const nonce = c.nonce ? `'nonce-${c.nonce === true ? '{{NONCE}}' : c.nonce}'` : null;
+  const useNonce = c.nonce || c.strictDynamic;
+  const nonce = useNonce ? `'nonce-${c.nonce === true || (c.strictDynamic && !c.nonce) ? '{{NONCE}}' : c.nonce}'` : null;
   const script = ["'self'", ...fin(srcs('script-src'))];
-  if (scan.hashes.script.size) script.push(...(nonce ? [nonce] : scan.hashes.script));
+  if (nonce) {
+    script.push(nonce);
+    if (c.strictDynamic) script.push("'strict-dynamic'");
+    else if (scan.hashes.script.size) script.push(...scan.hashes.script);
+  } else if (scan.hashes.script.size) script.push(...scan.hashes.script);
   if (scan.hashes.scriptAttr.size) script.push("'unsafe-hashes'", ...scan.hashes.scriptAttr);
   if (c.allowEval && scan.usesEval) script.push("'unsafe-eval'");
   d['script-src'] = script;
@@ -91,7 +101,10 @@ export function buildPolicy(scan, config = {}) {
   }
   if (c.upgradeInsecureRequests) d['upgrade-insecure-requests'] = [];
   if (c.reportUri) d['report-uri'] = [c.reportUri];
-  if (c.reportTo) d['report-to'] = [c.reportTo];
+  if (c.reportTo) {
+    const name = typeof c.reportTo === 'object' ? c.reportTo.name : c.reportTo;
+    if (name) d['report-to'] = [name];
+  }
   return d;
 }
 
