@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>csp-forge · Generate a tight Content-Security-Policy from your built site.</title>
+<meta name="description" content="Generate a tight Content-Security-Policy from your built site. Point it at dist/, build/ or out/ (and optionally a live URL). It works out exactly which sources the site loads and writes a policy with sha256 hashes, or nonce + strict-dynamic for SSR, ready to paste into Nginx, Apache, Netlify, Verce">
+<meta name="theme-color" content="#07090c">
+<link rel="canonical" href="https://mrlouiswright.github.io/csp-forge/">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:title" content="csp-forge: Generate a tight Content-Security-Policy from your built site.">
+<meta property="og:description" content="Generate a tight Content-Security-Policy from your built site. Point it at dist/, build/ or out/ (and optionally a live URL). It works out exactly which sources the site loads and writes a policy with sha256 hashes, or nonce + strict-dynamic for SSR, ready to paste into Nginx, Apache, Netlify, Verce">
+<meta property="og:url" content="https://mrlouiswright.github.io/csp-forge/">
+<meta property="og:image" content="https://mrlouiswright.github.io/csp-forge/og.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="csp-forge: Generate a tight Content-Security-Policy from your built site.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="csp-forge">
+<meta name="twitter:description" content="Generate a tight Content-Security-Policy from your built site.">
+<meta name="twitter:image" content="https://mrlouiswright.github.io/csp-forge/og.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>:root{--accent:#f59e0b;--accent-2:#b45309}</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="./"><span class="brand-g" aria-hidden="true">C</span>csp-forge</a>
+    <nav aria-label="Primary"><ul>
+      <li><a href="#features">Features</a></li><li><a href="#usage">Usage</a></li><li><a href="#ci">CI</a></li><li><a href="#options">Options</a></li>
+      <li><a class="gh" href="https://github.com/MrLouisWright/csp-forge">GitHub</a></li>
+    </ul></nav>
+  </div>
+</header>
+<main id="main">
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow"><span class="dot" aria-hidden="true"></span> npm package · MIT · Node ≥ 18</p>
+      <h1>csp-forge</h1>
+      <p class="tagline">Generate a tight Content-Security-Policy from your built site.</p>
+      <p class="lede">Point it at dist/, build/ or out/ (and optionally a live URL). It works out exactly which sources the site loads and writes a policy with sha256 hashes, or nonce + strict-dynamic for SSR, ready to paste into Nginx, Apache, Netlify, Vercel, Express/Helmet or a meta tag. --check fails CI when a deployed CSP is missing sources or too loose.</p>
+      <div class="install">
+        <code id="install-cmd"><span class="prompt" aria-hidden="true">$</span> npm i -D csp-forge</code>
+        <button class="copy" type="button" data-copy="npm i -D csp-forge" aria-label="Copy install command">Copy</button>
+        <span class="sr-only" role="status" aria-live="polite" id="copy-status"></span>
+      </div>
+      <div class="ctas">
+        <a class="btn primary" href="https://github.com/MrLouisWright/csp-forge#readme">Read the docs</a>
+        <a class="btn" href="https://www.npmjs.com/package/csp-forge">View on npm</a>
+        <a class="btn" href="https://github.com/MrLouisWright/csp-forge">Source on GitHub</a>
+      </div>
+      <div class="badges">
+        <a href="https://www.npmjs.com/package/csp-forge"><img src="https://img.shields.io/npm/v/csp-forge.svg?style=flat-square&amp;color=111" alt="npm version of csp-forge" height="20"></a>
+        <a href="https://github.com/MrLouisWright/csp-forge/actions/workflows/ci.yml"><img src="https://github.com/MrLouisWright/csp-forge/actions/workflows/ci.yml/badge.svg" alt="CI status" height="20"></a>
+        <a href="https://github.com/MrLouisWright/csp-forge/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="License: MIT" height="20"></a>
+        <a href="https://github.com/MrLouisWright/csp-forge"><img src="https://img.shields.io/github/stars/MrLouisWright/csp-forge?style=flat-square" alt="GitHub stars for csp-forge" height="20"></a>
+      </div>
+    </div>
+    <figure class="term" aria-label="Example terminal session running csp-forge">
+      <div class="term-bar"><span></span><span></span><span></span><em>~/project — zsh</em></div>
+      <pre class="term-body" data-cmd="npx csp-forge dist --check &quot;default-src 'self' 'unsafe-inline'; img-src *&quot;"><span class="ln cmd"><span class="prompt">$</span> <span class="typed">npx csp-forge dist --check &quot;default-src 'self' 'unsafe-inline'; img-src *&quot;</span><span class="caret" aria-hidden="true"></span></span><span class="out"><span class="ln dim">policy string checked against 4 scanned file(s)</span><span class="ln e">  ✖ error script-src blocks sources the site uses [csp-missing-source]</span><span class="ln dim">          Effective default-src does not allow https://cdn.jsdelivr.net (used in index.html).</span><span class="ln f">          fix: Example: Content-Security-Policy: script-src 'self' https://cdn.jsdelivr.net</span><span class="ln e">  ✖ error default-src allows 'unsafe-inline' [csp-unsafe-inline]</span><span class="ln f">          fix: Replace 'unsafe-inline' with the hashes from: npx csp-forge &lt;dir&gt; --format header</span><span class="ln e">  ✖ error img-src uses overly broad source * [csp-wildcard]</span><span class="ln f">          fix: List the explicit origins instead: img-src 'self' https://images.unsplash.com data:</span><span class="ln w">  ⚠ warn  base-uri missing [csp-missing-base-uri]</span><span class="ln f">          fix: Add &quot;base-uri 'self'&quot;.</span><span class="ln dim">&nbsp;</span><span class="ln b">1 policy(ies) checked: 3 error(s), 1 warning(s)</span></span></pre>
+      <figcaption class="sr-only">Sample output adapted from the csp-forge README.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="sec" id="problem">
+  <div class="wrap narrow">
+    <h2><span class="h-idx">01</span> The problem</h2>
+    <p class="big">Writing a CSP by hand means guessing every script, style, font, image and API origin your site touches. Guess too tight and the site breaks; too loose and 'unsafe-inline' or * quietly defeats the point.</p>
+    <p class="big">csp-forge reads your actual build output, hashes every inline block, and emits the narrowest policy that still works. Then --check keeps it honest in CI as the site changes.</p>
+  </div>
+</section>
+
+<section class="sec" id="features">
+  <div class="wrap">
+    <h2><span class="h-idx">02</span> Features</h2>
+    <div class="grid">
+      <article class="card"><span class="card-i" aria-hidden="true">01</span><h3>Built from your build</h3><p>Scans HTML, CSS and JS in dist/ for scripts, styles, images, fonts, media, frames, workers, manifests and form actions.</p></article>
+      <article class="card"><span class="card-i" aria-hidden="true">02</span><h3>Hashes or nonces</h3><p>sha256 hashes for static sites, or nonce + strict-dynamic with SSR helpers and Express-style middleware.</p></article>
+      <article class="card"><span class="card-i" aria-hidden="true">03</span><h3>Paste-ready formats</h3><p>header, raw, meta, nginx, apache, netlify, vercel, express, helmet, json and reporting-endpoints.</p></article>
+      <article class="card"><span class="card-i" aria-hidden="true">04</span><h3>--check for CI</h3><p>Compare a policy string, file or live URL with what the build needs. Flags missing sources, unsafe keywords, wildcards and stale hashes.</p></article>
+      <article class="card"><span class="card-i" aria-hidden="true">05</span><h3>Safe rollouts</h3><p>--report-only with report-uri, or modern report-to + Reporting-Endpoints.</p></article>
+      <article class="card"><span class="card-i" aria-hidden="true">06</span><h3>Vite &amp; webpack plugins</h3><p>Run the scan automatically after each production build.</p></article>
+      <article class="card"><span class="card-i" aria-hidden="true">07</span><h3>--write</h3><p>Inject the meta tag into every HTML file, or write dist/_headers for Netlify / Cloudflare Pages.</p></article>
+      <article class="card"><span class="card-i" aria-hidden="true">08</span><h3>Zero runtime deps</h3><p>Node ≥ 18, dual ESM/CJS, JSON and SARIF output.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="usage">
+  <div class="wrap">
+    <h2><span class="h-idx">03</span> Usage</h2>
+    <div class="usage">
+      <div class="u"><p class="u-t"># Generate a header</p><pre><code><span class="prompt" aria-hidden="true">$</span> npx csp-forge dist -f header</code></pre></div>
+      <div class="u"><p class="u-t"># Write Netlify _headers</p><pre><code><span class="prompt" aria-hidden="true">$</span> npx csp-forge dist -f netlify --write</code></pre></div>
+      <div class="u"><p class="u-t"># Nonce + strict-dynamic (SSR)</p><pre><code><span class="prompt" aria-hidden="true">$</span> npx csp-forge dist --strict-dynamic -f header</code></pre></div>
+      <div class="u"><p class="u-t"># Check a live site against the build</p><pre><code><span class="prompt" aria-hidden="true">$</span> npx csp-forge dist --check https://example.com</code></pre></div>
+    </div>
+
+  </div>
+</section>
+
+<section class="sec" id="ci">
+  <div class="wrap">
+    <h2><span class="h-idx">04</span> CI / GitHub Action</h2>
+    <pre class="code yaml"><code># .github/workflows/csp.yml
+name: CSP
+on: [push, pull_request]
+permissions: { contents: read, security-events: write }
+jobs:
+  csp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm ci &amp;&amp; npm run build
+      - run: npx csp-forge@1 dist --check dist/_headers --sarif csp.sarif
+      - uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with: { sarif_file: csp.sarif }</code></pre>
+  </div>
+</section>
+
+<section class="sec" id="options">
+  <div class="wrap">
+    <h2><span class="h-idx">05</span> Options &amp; flags</h2>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th scope="col">Flag</th><th scope="col">Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>-u, --url &lt;url&gt;</code></td><td>Also scan a live page (+ same-origin CSS/JS); its origin counts as 'self'</td></tr>
+        <tr><td><code>--origin &lt;url&gt;</code></td><td>Treat this absolute origin as 'self' when scanning a directory</td></tr>
+        <tr><td><code>-c, --config &lt;file&gt;</code></td><td>JSON config (default: .csp-forgerc.json / .cspbuilderrc.json / package.json &quot;csp-forge&quot;)</td></tr>
+        <tr><td><code>-f, --format &lt;fmt&gt;</code></td><td>header | raw | meta | nginx | apache | netlify | vercel | express | helmet | json | reporting-endpoints</td></tr>
+        <tr><td><code>--nonce[=value]</code></td><td>'nonce-{{NONCE}}' (or 'nonce-&lt;value&gt;') instead of inline hashes</td></tr>
+        <tr><td><code>--strict-dynamic</code></td><td>Nonce mode with 'strict-dynamic' (best for SSR)</td></tr>
+        <tr><td><code>--report-only</code></td><td>Emit Content-Security-Policy-Report-Only</td></tr>
+        <tr><td><code>--report-uri &lt;url&gt;</code></td><td>Add report-uri (legacy reporting)</td></tr>
+        <tr><td><code>--report-to &lt;name&gt;</code></td><td>Add report-to (use with --reporting-endpoint-url)</td></tr>
+        <tr><td><code>--reporting-endpoint-url &lt;url&gt;</code></td><td>URL for the Reporting-Endpoints header</td></tr>
+        <tr><td><code>--frame-ancestors &lt;v&gt;</code></td><td>Default 'none'; &quot;off&quot; omits it</td></tr>
+        <tr><td><code>--allow-wildcards</code></td><td>Allow collapsing 3+ subdomains into https://*.domain</td></tr>
+        <tr><td><code>--no-upgrade</code></td><td>Omit upgrade-insecure-requests</td></tr>
+        <tr><td><code>--write</code></td><td>meta: inject &lt;meta&gt; into every HTML file; netlify: write &lt;dir&gt;/_headers</td></tr>
+        <tr><td><code>-q, --quiet</code></td><td>No summary on stderr</td></tr>
+        <tr><td><code>--check &lt;x&gt;</code></td><td>Policy string, file (HTML meta, _headers, nginx conf, vercel.json) or URL</td></tr>
+        <tr><td><code>--fail-on &lt;level&gt;</code></td><td>error | warn | none (default: error)</td></tr>
+        <tr><td><code>--json</code></td><td>Print JSON results</td></tr>
+        <tr><td><code>--sarif [file]</code></td><td>Print SARIF 2.1.0 (or write to file)</td></tr>
+        <tr><td><code>-t, --timeout &lt;ms&gt;</code></td><td>Network timeout (default: 15000)</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">Full reference, config file format and API in the <a href="https://github.com/MrLouisWright/csp-forge#readme">README</a>.</p>
+  </div>
+</section>
+
+<section class="sec more" id="more">
+  <div class="wrap">
+    <h2><span class="h-idx">06</span> More tools by Louis Wright</h2>
+    <div class="tools">
+<a class="tool" href="https://mrlouiswright.github.io/bundle-secret-guard/" style="--a:#f43f5e"><span class="tool-g" aria-hidden="true">S</span><span><strong>bundle-secret-guard</strong><small>Fail the build when secrets ship to the browser.</small></span></a>
+<a class="tool" href="https://mrlouiswright.github.io/cookie-sentinel/" style="--a:#fbbf24"><span class="tool-g" aria-hidden="true">K</span><span><strong>cookie-sentinel</strong><small>Audit the cookies your site sets before attackers do.</small></span></a>
+<a class="tool" href="https://mrlouiswright.github.io/form-honeypot-guard/" style="--a:#a3e635"><span class="tool-g" aria-hidden="true">F</span><span><strong>form-honeypot-guard</strong><small>Block form spam bots without a captcha.</small></span></a>
+<a class="tool" href="https://mrlouiswright.github.io/header-sentinel/" style="--a:#22d3ee"><span class="tool-g" aria-hidden="true">H</span><span><strong>header-sentinel</strong><small>Fail CI when deployed URLs ship weak HTTP security headers.</small></span></a>
+<a class="tool" href="https://mrlouiswright.github.io/license-sentinel/" style="--a:#60a5fa"><span class="tool-g" aria-hidden="true">⚖</span><span><strong>license-sentinel</strong><small>A license compliance gate for npm projects, plus CycloneDX/SPDX SBOMs and a NOTICES file.</small></span></a>
+<a class="tool" href="https://mrlouiswright.github.io/package-tripwire/" style="--a:#fb923c"><span class="tool-g" aria-hidden="true">P</span><span><strong>package-tripwire</strong><small>Fail CI when dependency changes look suspicious.</small></span></a>
+<a class="tool" href="https://mrlouiswright.github.io/sri-sentinel/" style="--a:#34d399"><span class="tool-g" aria-hidden="true">I</span><span><strong>sri-sentinel</strong><small>Subresource Integrity for your built site: generate, write and check it in CI.</small></span></a>
+<a class="tool" href="https://mrlouiswright.github.io/static-link-sentinel/" style="--a:#a78bfa"><span class="tool-g" aria-hidden="true">L</span><span><strong>static-link-sentinel</strong><small>Fail CI on broken links before you deploy.</small></span></a>
+<a class="tool" href="https://mrlouiswright.github.io/workflow-sentinel/" style="--a:#2dd4bf"><span class="tool-g" aria-hidden="true">W</span><span><strong>workflow-sentinel</strong><small>Catch insecure GitHub Actions workflows before they're merged.</small></span></a>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="foot">
+  <div class="wrap foot-in">
+    <p>MIT © <a href="https://github.com/MrLouisWright">Louis Wright</a></p>
+    <p><a href="https://github.com/MrLouisWright/csp-forge">GitHub</a> · <a href="https://www.npmjs.com/package/csp-forge">npm</a> · <a href="https://github.com/MrLouisWright/csp-forge#readme">README</a></p>
+  </div>
+</footer>
+<script src="app.js" defer></script>
+</body>
+</html>
