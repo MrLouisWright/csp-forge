@@ -1,6 +1,6 @@
 {
   "name": "csp-forge",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Scan a built static site (dist/, build/, out/) or live URL and generate a tight Content-Security-Policy with sha256 hashes or nonce + strict-dynamic for SSR. Vite/webpack plugins, reporting headers, --check for CI.",
   "type": "module",
   "main": "./dist/index.cjs",
