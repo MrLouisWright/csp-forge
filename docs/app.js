@@ -18,3 +18,9 @@
   function show(){if(j<lines.length){lines[j++].style.visibility='visible';setTimeout(show,95);}}
   setTimeout(type,500);
 })();
+(function(){
+  var q=document.getElementById('tool-q'),n=document.getElementById('tool-n');if(!q)return;
+  q.addEventListener('input',function(){var v=q.value.trim().toLowerCase(),c=0;
+    [].forEach.call(document.querySelectorAll('.fam'),function(f){var any=0;[].forEach.call(f.querySelectorAll('li'),function(li){var m=!v||li.firstChild.getAttribute('data-q').indexOf(v)>-1;li.hidden=!m;if(m){any++;c++;}});f.hidden=!any;});
+    n.textContent=c+(c===1?' tool':' tools');});
+})();
