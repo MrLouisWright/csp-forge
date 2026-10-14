@@ -320,6 +320,10 @@ git push --follow-tags
 
 Then create a GitHub release from the new tag. `.github/workflows/release.yml` runs the tests on Node 22 and publishes to npmjs (`npm publish --provenance`, needs the `NPM_TOKEN` secret) and to GitHub Packages as `@mrlouiswright/csp-forge`. Versions that already exist are skipped.
 
+## Support
+
+If this project is useful to you, you can support its development with a donation: [Buy me a coffee](https://donate.stripe.com/aFa00lek3cvX4Ds2Fk9EI0b). It helps keep these tools maintained, documented and free for everyone.
+
 ## License
 
 MIT © Louis Wright ([Louis Wright](https://github.com/MrLouisWright))
