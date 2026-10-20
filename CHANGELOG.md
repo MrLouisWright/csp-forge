@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## 1.1.2 - 2026-10-20
+
+- Ships the 1.1.1 changes: v1.1.1 was tagged on GitHub but never reached npm because its release test hard-coded the 1.1.0 version.
+- Test reads the expected CLI version from package.json.
+- Release workflow installs dependencies before publishing.
+- Docs: README credit and support sections.
+
 ## [1.1.0] - 2026-10-14
 
 ### Added
