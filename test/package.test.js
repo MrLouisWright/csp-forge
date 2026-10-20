@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
@@ -20,7 +21,7 @@ test('dist cli runs', () => {
   const cli = fileURLToPath(new URL('../dist/cli.js', import.meta.url));
   const r = spawnSync(process.execPath, [cli, '--version'], { encoding: 'utf8', cwd: root });
   assert.equal(r.status, 0);
-  assert.match(r.stdout, /^1\.1\.0/);
+  assert.equal(r.stdout.trim(), JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version);
 });
 
 test('subpath vite and webpack plugins load', async () => {
