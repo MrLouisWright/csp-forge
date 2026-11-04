@@ -322,7 +322,9 @@ Then create a GitHub release from the new tag. `.github/workflows/release.yml` r
 
 ## Support
 
-If this project is useful to you, you can support its development with a donation: [Buy me a coffee](https://donate.stripe.com/aFa00lek3cvX4Ds2Fk9EI0b). It helps keep these tools maintained, documented and free for everyone.
+If this project is useful to you, you can support its development with a donation: [Buy me a coffee](https://donate.stripe.com/aFa00lek3cvX4Ds2Fk9EI0b) or [GitHub Sponsors](https://github.com/sponsors/MrLouisWright). It helps keep these tools maintained, documented and free for everyone.
+
+[![Sponsor](https://img.shields.io/badge/Sponsor-GitHub-ea4aaa?logo=githubsponsors)](https://github.com/sponsors/MrLouisWright)
 
 ## Credit (optional)
 
